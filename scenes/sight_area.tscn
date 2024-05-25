@@ -1,0 +1,45 @@
+[gd_scene load_steps=7 format=3 uid="uid://bcc8lxfw4hpmo"]
+
+[ext_resource type="Script" path="res://sight area.gd" id="1_762fc"]
+
+[sub_resource type="Gradient" id="Gradient_mtaox"]
+offsets = PackedFloat32Array(0, 0.551867)
+colors = PackedColorArray(1, 1, 1, 0.470588, 1, 1, 1, 0.0901961)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_2h2yo"]
+gradient = SubResource("Gradient_mtaox")
+
+[sub_resource type="Gradient" id="Gradient_emwqn"]
+offsets = PackedFloat32Array(0, 0.560575)
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_5ort8"]
+gradient = SubResource("Gradient_emwqn")
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_if45h"]
+radius = 6.0
+
+[node name="sight area" type="Area2D"]
+z_index = -1
+collision_layer = 0
+input_pickable = false
+script = ExtResource("1_762fc")
+radius = 128
+tracked_objects_mask = 3
+color = Color(1, 0, 0, 1)
+gradient = SubResource("GradientTexture1D_2h2yo")
+
+[node name="visual area" type="Polygon2D" parent="."]
+color = Color(1, 0, 0, 0.45098)
+texture = SubResource("GradientTexture1D_5ort8")
+
+[node name="area edge" type="Line2D" parent="."]
+closed = true
+width = 1.0
+default_color = Color(1, 0.300051, 0.236805, 0.372549)
+
+[node name="hitbox" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_if45h")
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="area_exited" from="." to="." method="_on_area_exited"]

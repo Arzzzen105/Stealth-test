@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3 uid="uid://cp43i20j00q0q"]
+
+[ext_resource type="Script" path="res://player.gd" id="1_i8x5m"]
+[ext_resource type="PackedScene" uid="uid://4gidynwl66ve" path="res://scenes/circle_polygon.tscn" id="2_nxmtu"]
+[ext_resource type="PackedScene" uid="uid://6jqb0513rwt5" path="res://scenes/area_of_sight_agent.tscn" id="3_cyp58"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_d2sey"]
+radius = 5.0
+
+[node name="player" type="CharacterBody2D" groups=["player"]]
+collision_layer = 0
+collision_mask = 6
+motion_mode = 1
+wall_min_slide_angle = 0.0
+script = ExtResource("1_i8x5m")
+speed = 48
+
+[node name="hitbox" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_d2sey")
+
+[node name="sprite" parent="." instance=ExtResource("2_nxmtu")]
+color = Color(0, 0.905882, 0, 1)
+
+[node name="AreaOfSightAgent" parent="." node_paths=PackedStringArray("parent_node") instance=ExtResource("3_cyp58")]
+parent_node = NodePath("..")

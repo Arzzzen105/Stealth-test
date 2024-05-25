@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://4gidynwl66ve"]
+
+[ext_resource type="Script" path="res://circle_polygon.gd" id="1_jhdgd"]
+
+[node name="circle polygon" type="Polygon2D"]
+polygon = PackedVector2Array(6, 0, 0, 6, -6, 0, 0, -6)
+script = ExtResource("1_jhdgd")

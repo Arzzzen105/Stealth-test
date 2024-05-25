@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://6jqb0513rwt5"]
+
+[ext_resource type="Script" path="res://area_of_sight_agent.gd" id="1_y0w78"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_00y8k"]
+radius = 6.0
+
+[node name="AreaOfSightAgent" type="Area2D" groups=["area of sight agent"]]
+collision_mask = 0
+script = ExtResource("1_y0w78")
+shape = SubResource("CircleShape2D_00y8k")
+
+[node name="Hitbox" type="CollisionShape2D" parent="."]

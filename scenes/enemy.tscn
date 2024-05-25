@@ -1,0 +1,106 @@
+[gd_scene load_steps=13 format=3 uid="uid://1jvqwxgtkeu3"]
+
+[ext_resource type="PackedScene" uid="uid://4gidynwl66ve" path="res://scenes/circle_polygon.tscn" id="1_aibrp"]
+[ext_resource type="Script" path="res://enemy.gd" id="1_g2vft"]
+[ext_resource type="PackedScene" uid="uid://bcc8lxfw4hpmo" path="res://scenes/sight_area.tscn" id="2_pj5db"]
+[ext_resource type="PackedScene" uid="uid://bp4tq8yird08m" path="res://scenes/state_machine.tscn" id="4_or532"]
+[ext_resource type="Script" path="res://patrol state.gd" id="5_bflh5"]
+[ext_resource type="Script" path="res://chase state.gd" id="6_q12j3"]
+[ext_resource type="Script" path="res://back to patrolling state.gd" id="7_a4mea"]
+[ext_resource type="PackedScene" uid="uid://6jqb0513rwt5" path="res://scenes/area_of_sight_agent.tscn" id="8_6ox6l"]
+[ext_resource type="Script" path="res://searching state.gd" id="8_uqfoq"]
+[ext_resource type="Script" path="res://check position state.gd" id="9_lm1jo"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_r122i"]
+radius = 5.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_b0i5k"]
+font_size = 8
+outline_color = Color(0, 0, 0, 1)
+
+[node name="enemy" type="CharacterBody2D" groups=["enemy"]]
+collision_layer = 2
+collision_mask = 5
+motion_mode = 1
+wall_min_slide_angle = 0.0
+script = ExtResource("1_g2vft")
+blind_chasing_time = 0.8
+
+[node name="hitbox" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_r122i")
+
+[node name="sprite" parent="." instance=ExtResource("1_aibrp")]
+color = Color(1, 0.247059, 0.188235, 1)
+
+[node name="sight area" parent="." node_paths=PackedStringArray("parent_body", "parent_agent") instance=ExtResource("2_pj5db")]
+parent_body = NodePath("..")
+parent_agent = NodePath("../AreaOfSightAgent")
+
+[node name="pathfinder" type="NavigationAgent2D" parent="."]
+path_desired_distance = 2.0
+target_desired_distance = 2.0
+avoidance_enabled = true
+radius = 5.0
+neighbor_distance = 100.0
+max_neighbors = 6
+time_horizon_agents = 0.5
+max_speed = 32.0
+debug_enabled = true
+debug_path_custom_line_width = 0.99
+
+[node name="state machine" parent="." node_paths=PackedStringArray("initial_state") instance=ExtResource("4_or532")]
+initial_state = NodePath("patrol state")
+
+[node name="patrol state" type="Node" parent="state machine" node_paths=PackedStringArray("enemy")]
+script = ExtResource("5_bflh5")
+enemy = NodePath("../..")
+
+[node name="wait_timer" type="Timer" parent="state machine/patrol state"]
+one_shot = true
+
+[node name="chase state" type="Node" parent="state machine" node_paths=PackedStringArray("enemy")]
+script = ExtResource("6_q12j3")
+enemy = NodePath("../..")
+
+[node name="update path timer" type="Timer" parent="state machine/chase state"]
+wait_time = 0.2
+
+[node name="blind chasing timer" type="Timer" parent="state machine/chase state"]
+wait_time = 0.8
+one_shot = true
+
+[node name="back to patrolling state" type="Node" parent="state machine" node_paths=PackedStringArray("enemy", "patrol_state")]
+script = ExtResource("7_a4mea")
+enemy = NodePath("../..")
+patrol_state = NodePath("../patrol state")
+
+[node name="searching state" type="Node" parent="state machine" node_paths=PackedStringArray("enemy")]
+script = ExtResource("8_uqfoq")
+enemy = NodePath("../..")
+
+[node name="wait timer" type="Timer" parent="state machine/searching state"]
+wait_time = 3.0
+one_shot = true
+
+[node name="check position state" type="Node" parent="state machine" node_paths=PackedStringArray("enemy")]
+script = ExtResource("9_lm1jo")
+enemy = NodePath("../..")
+
+[node name="AreaOfSightAgent" parent="." node_paths=PackedStringArray("parent_node") instance=ExtResource("8_6ox6l")]
+collision_layer = 2
+parent_node = NodePath("..")
+
+[node name="Label" type="Label" parent="."]
+offset_left = -20.0
+offset_top = -30.0
+offset_right = 20.0
+offset_bottom = -7.0
+label_settings = SubResource("LabelSettings_b0i5k")
+
+[connection signal="entity_entered" from="sight area" to="." method="_on_sight_area_entity_entered"]
+[connection signal="entity_exited" from="sight area" to="." method="_on_sight_area_entity_exited"]
+[connection signal="velocity_computed" from="pathfinder" to="." method="_on_pathfinder_velocity_computed"]
+[connection signal="timeout" from="state machine/patrol state/wait_timer" to="state machine/patrol state" method="_on_wait_timer_timeout"]
+[connection signal="timeout" from="state machine/chase state/update path timer" to="state machine/chase state" method="_on_update_path_timer_timeout"]
+[connection signal="timeout" from="state machine/chase state/blind chasing timer" to="state machine/chase state" method="_on_blind_chasing_timer_timeout"]
+[connection signal="timeout" from="state machine/searching state/wait timer" to="state machine/searching state" method="_on_wait_timer_timeout"]
