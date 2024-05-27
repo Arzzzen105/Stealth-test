@@ -9,6 +9,7 @@ var target_pos : Vector2 = Vector2.ZERO
 var dir : Vector2 = Vector2.ZERO
 
 func enter():
+	enemy.change_colors(enemy.patrol_colors)
 	target_pos = patrol_state.path_array[patrol_state.current_point].position
 	pathfinder = enemy.nav_agent
 	find_path()

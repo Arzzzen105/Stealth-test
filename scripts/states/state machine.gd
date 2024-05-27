@@ -14,6 +14,7 @@ func _ready():
 			child.transitioned.connect(on_child_transition)
 			
 	if initial_state:
+		await get_tree().physics_frame
 		initial_state.enter()
 		current_state = initial_state
 			

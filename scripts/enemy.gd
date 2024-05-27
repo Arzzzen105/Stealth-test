@@ -1,12 +1,12 @@
 extends CharacterBody2D
 class_name PatrolEnemy
 
+@onready var sprite = $sprite
 @onready var sight_area = $"sight area"
 @onready var nav_agent : NavigationAgent2D = $pathfinder
 @onready var state_machine : StateMachine = $"state machine"
 @onready var patrol_state = $"state machine/patrol state"
 @onready var chase_state = $"state machine/chase state"
-@onready var check_position_state = $"state machine/check position state"
 
 @export_category("Enemy")
 
@@ -18,16 +18,19 @@ class_name PatrolEnemy
 @export_group("Patrolling state")
 @export var path : PatrolPath
 @export var walking_speed : int = 24
+@export var patrol_colors : EnemyColorData
 
 @export_group("Chasing state")
 @export var running_speed : int = 32
 @export var blind_chasing_time : float = 3.0
+@export var chase_colors : EnemyColorData
 
 @export_group("Searching state")
 @export var searching_speed : int = 24
 @export var baked_points_amount : int = 3
 @export var baked_point_wait_time : float = 3.0
 @export var random_point_radius : int = 128
+@export var search_colors : EnemyColorData
 
 var sees_player : bool = false
 var intended_velocity : Vector2 = Vector2.ZERO
@@ -38,13 +41,7 @@ func _ready():
 	queue_redraw()
 
 func _process(delta):
-	
 	sight_area.update()
-	$Label.text = state_machine.current_state.name
-	if state_machine.current_state.name == "check position state":
-		$Label.text = state_machine.current_state.name + ": " + state_machine.current_state.reason
-	else: 
-		$Label.text = state_machine.current_state.name
 
 func _physics_process(delta):
 	sight_area.physics_update()
@@ -83,7 +80,6 @@ func _on_sight_area_entity_exited(entity):
 func tell_another_enemy_about_player(another_enemy : PatrolEnemy):
 	another_enemy.state_machine.current_state.transitioned.emit(another_enemy.state_machine.current_state, "chase state")
 
-
 func _on_pathfinder_velocity_computed(safe_velocity):
 	velocity = safe_velocity
 	move_and_slide()
@@ -93,3 +89,16 @@ func tell_all_achieveble_enemies_about_player():
 		if entity.is_in_group("enemy"):
 			if entity.state_machine.current_state.name != "chase state":
 				tell_another_enemy_about_player(entity)
+
+func sees_another_chasing_enemy() -> bool:
+	for entity in sight_area.get_spotted_entities():
+		if entity.is_in_group("enemy"):
+			if entity.state_machine.current_state.name == "chase state" and entity.sees_player:
+				return true
+	return false
+
+func change_colors(colors_data : EnemyColorData):
+	sprite.color = colors_data.enemy_color
+	sprite.edge.default_color = colors_data.enemy_edge
+	sight_area.polygon.color = colors_data.sight_area_color
+	sight_area.polygon_edge.default_color = colors_data.sight_area_edge

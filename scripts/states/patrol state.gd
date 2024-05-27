@@ -14,6 +14,7 @@ var path_is_cycle : bool
 var order = 1
 
 func enter():
+	enemy.change_colors(enemy.patrol_colors)
 	await get_tree().physics_frame
 	enemy.nav_agent.set_velocity(Vector2.ZERO)
 	enemy.intended_velocity = Vector2.ZERO
@@ -42,7 +43,6 @@ func physics_update(_delta : float):
 			waits = true
 	else:
 		dir = enemy.global_position.direction_to(current_target_pos)
-		print_debug(dir * enemy.walking_speed)
 		enemy.intended_velocity = dir * enemy.walking_speed
 
 func get_next_point():

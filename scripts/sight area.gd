@@ -5,7 +5,7 @@ extends Area2D
 @onready var polygon_edge = $"area edge"
 var space_state : PhysicsDirectSpaceState2D
 
-# @export_category("AreaOfSight")
+#@export_category("AreaOfSight")
 
 ## Export here a parent of the area (like enemies).
 @export var parent_body : Node2D 
@@ -28,7 +28,8 @@ var space_state : PhysicsDirectSpaceState2D
 @export_flags_2d_physics var tracked_objects_mask = 1
 
 @export_group("Color")
-@export var color : Color = Color(1, 0, 0, 0.5)
+@export var color : Color = Color(0.404, 0.643, 1)
+@export var alert_color : Color = Color(1, 0, 0)
 @export var gradient : GradientTexture1D
 @export var show_edge : bool = false
 @export var edge_color : Color = Color(1, 0.3, 0.237, 0.373)

@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://bcc8lxfw4hpmo"]
 
-[ext_resource type="Script" path="res://sight area.gd" id="1_762fc"]
+[ext_resource type="Script" path="res://scripts/sight area.gd" id="1_762fc"]
 
 [sub_resource type="Gradient" id="Gradient_mtaox"]
 offsets = PackedFloat32Array(0, 0.551867)
@@ -26,7 +26,6 @@ input_pickable = false
 script = ExtResource("1_762fc")
 radius = 128
 tracked_objects_mask = 3
-color = Color(1, 0, 0, 1)
 gradient = SubResource("GradientTexture1D_2h2yo")
 
 [node name="visual area" type="Polygon2D" parent="."]

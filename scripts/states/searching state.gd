@@ -11,6 +11,7 @@ var points_to_check_left : int
 var waits : bool
 
 func enter():
+	enemy.change_colors(enemy.search_colors)
 	points_to_check_left = enemy.baked_points_amount
 	timer.wait_time = enemy.baked_point_wait_time
 	player = get_tree().get_first_node_in_group("player")

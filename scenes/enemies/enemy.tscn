@@ -1,22 +1,39 @@
-[gd_scene load_steps=13 format=3 uid="uid://1jvqwxgtkeu3"]
+[gd_scene load_steps=15 format=3 uid="uid://1jvqwxgtkeu3"]
 
 [ext_resource type="PackedScene" uid="uid://4gidynwl66ve" path="res://scenes/circle_polygon.tscn" id="1_aibrp"]
-[ext_resource type="Script" path="res://enemy.gd" id="1_g2vft"]
-[ext_resource type="PackedScene" uid="uid://bcc8lxfw4hpmo" path="res://scenes/sight_area.tscn" id="2_pj5db"]
-[ext_resource type="PackedScene" uid="uid://bp4tq8yird08m" path="res://scenes/state_machine.tscn" id="4_or532"]
-[ext_resource type="Script" path="res://patrol state.gd" id="5_bflh5"]
-[ext_resource type="Script" path="res://chase state.gd" id="6_q12j3"]
-[ext_resource type="Script" path="res://back to patrolling state.gd" id="7_a4mea"]
+[ext_resource type="Script" path="res://scripts/enemy.gd" id="1_g2vft"]
+[ext_resource type="PackedScene" uid="uid://bcc8lxfw4hpmo" path="res://scenes/enemies/sight_area.tscn" id="2_pj5db"]
+[ext_resource type="Script" path="res://scripts/enemy_color_data.gd" id="2_xk0y6"]
+[ext_resource type="PackedScene" uid="uid://bp4tq8yird08m" path="res://scenes/states/state_machine.tscn" id="4_or532"]
+[ext_resource type="Script" path="res://scripts/states/patrol state.gd" id="5_bflh5"]
+[ext_resource type="Script" path="res://scripts/states/chase state.gd" id="6_q12j3"]
+[ext_resource type="Script" path="res://scripts/states/back to patrolling state.gd" id="7_a4mea"]
 [ext_resource type="PackedScene" uid="uid://6jqb0513rwt5" path="res://scenes/area_of_sight_agent.tscn" id="8_6ox6l"]
-[ext_resource type="Script" path="res://searching state.gd" id="8_uqfoq"]
-[ext_resource type="Script" path="res://check position state.gd" id="9_lm1jo"]
+[ext_resource type="Script" path="res://scripts/states/searching state.gd" id="8_uqfoq"]
+
+[sub_resource type="Resource" id="Resource_8jqxt"]
+script = ExtResource("2_xk0y6")
+sight_area_color = Color(0.239216, 0.588235, 0.654902, 1)
+sight_area_edge = Color(0.176471, 0.466667, 0.517647, 1)
+enemy_color = Color(0.262745, 0.556863, 0.803922, 1)
+enemy_edge = Color(0.168627, 0.423529, 0.631373, 1)
+
+[sub_resource type="Resource" id="Resource_mfcd8"]
+script = ExtResource("2_xk0y6")
+sight_area_color = Color(0.964706, 0.176471, 0, 1)
+sight_area_edge = Color(0.835294, 0.14902, 0, 1)
+enemy_color = Color(0.882353, 0.00392157, 0, 1)
+enemy_edge = Color(0.65098, 0.00392157, 0, 1)
+
+[sub_resource type="Resource" id="Resource_0jfcx"]
+script = ExtResource("2_xk0y6")
+sight_area_color = Color(0.964706, 0.8, 0, 1)
+sight_area_edge = Color(0.8, 0.662745, 0, 1)
+enemy_color = Color(0.894118, 0.8, 0, 1)
+enemy_edge = Color(0.729412, 0.65098, 0, 1)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_r122i"]
 radius = 5.0
-
-[sub_resource type="LabelSettings" id="LabelSettings_b0i5k"]
-font_size = 8
-outline_color = Color(0, 0, 0, 1)
 
 [node name="enemy" type="CharacterBody2D" groups=["enemy"]]
 collision_layer = 2
@@ -24,13 +41,20 @@ collision_mask = 5
 motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("1_g2vft")
+distance = 96
+rotation_speed = 4.0
+patrol_colors = SubResource("Resource_8jqxt")
 blind_chasing_time = 0.8
+chase_colors = SubResource("Resource_mfcd8")
+search_colors = SubResource("Resource_0jfcx")
 
 [node name="hitbox" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_r122i")
 
 [node name="sprite" parent="." instance=ExtResource("1_aibrp")]
-color = Color(1, 0.247059, 0.188235, 1)
+color = Color(1, 0, 0, 1)
+edge_color = Color(0.796078, 0, 0, 1)
+edge_size = 0.6
 
 [node name="sight area" parent="." node_paths=PackedStringArray("parent_body", "parent_agent") instance=ExtResource("2_pj5db")]
 parent_body = NodePath("..")
@@ -45,7 +69,6 @@ neighbor_distance = 100.0
 max_neighbors = 6
 time_horizon_agents = 0.5
 max_speed = 32.0
-debug_enabled = true
 debug_path_custom_line_width = 0.99
 
 [node name="state machine" parent="." node_paths=PackedStringArray("initial_state") instance=ExtResource("4_or532")]
@@ -82,20 +105,9 @@ enemy = NodePath("../..")
 wait_time = 3.0
 one_shot = true
 
-[node name="check position state" type="Node" parent="state machine" node_paths=PackedStringArray("enemy")]
-script = ExtResource("9_lm1jo")
-enemy = NodePath("../..")
-
 [node name="AreaOfSightAgent" parent="." node_paths=PackedStringArray("parent_node") instance=ExtResource("8_6ox6l")]
 collision_layer = 2
 parent_node = NodePath("..")
-
-[node name="Label" type="Label" parent="."]
-offset_left = -20.0
-offset_top = -30.0
-offset_right = 20.0
-offset_bottom = -7.0
-label_settings = SubResource("LabelSettings_b0i5k")
 
 [connection signal="entity_entered" from="sight area" to="." method="_on_sight_area_entity_entered"]
 [connection signal="entity_exited" from="sight area" to="." method="_on_sight_area_entity_exited"]

@@ -12,6 +12,7 @@ var can_blind_update : bool
 var saw_player_during_blind_chasing : bool = true
 
 func enter():
+	enemy.change_colors(enemy.chase_colors)
 	can_blind_update = true
 	saw_player_during_blind_chasing = true
 	blind_chasing_timer.wait_time = enemy.blind_chasing_time
@@ -21,6 +22,7 @@ func enter():
 	update_path_timer.start()
 	
 func exit():
+	
 	update_path_timer.stop()
 	blind_chasing_timer.stop()
 	
@@ -49,7 +51,7 @@ func update_path():
 	pathfinder.target_position = player.global_position
 
 func _on_update_path_timer_timeout():
-	if enemy.sees_player or can_blind_update or enemy.global_position.distance_to(player.global_position) < 24:
+	if enemy.sees_player or can_blind_update or enemy.global_position.distance_to(player.global_position) < 24 or enemy.sees_another_chasing_enemy():
 		update_path()
 
 func _on_blind_chasing_timer_timeout():
